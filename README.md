@@ -1,54 +1,270 @@
-<script>
-    // 1. MASTER ADMIN PASSWORD
-    const ADMIN_PASS = "ARCHER2026"; 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CWHOMESKY | Private Ad & Graphic Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .font-luxury { font-family: 'Cinzel', serif; }
+        .script-headline { font-family: 'Great Vibes', cursive; }
+        .glass-card { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .draggable-element { cursor: move; user-select: none; }
+        .format-feed { width: 420px; min-height: 420px; }
+        .format-story { width: 340px; min-height: 600px; }
+        .format-flyer { width: 420px; min-height: 540px; }
+    </style>
+</head>
+<body class="min-h-screen">
 
-    // 2. INDIVIDUAL SUBSCRIBER PASSKEYS & START DATES
-    const SUBSCRIBER_KEYS = {
-        "CLIENT_SMITH_101": Date.now(),               // Smith's key (starts today)
-        "AGENT_JONES_202": Date.parse("2026-08-01"),  // Jones's key (started Aug 1)
-        "REALTOR_LEE_303": Date.now()                 // Lee's key (starts today)
-    };
+    <!-- PASSWORD AUTHENTICATION OVERLAY LOCK -->
+    <div id="auth-lock-overlay" class="fixed inset-0 z-50 bg-slate-950/95 flex items-center justify-center p-6">
+        <div class="glass-card max-w-md w-full p-8 rounded-2xl text-center space-y-6 shadow-2xl border border-amber-500/30">
+            <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                🔒
+            </div>
+            <div>
+                <h2 class="font-luxury text-2xl font-bold text-white">Private Studio Access</h2>
+                <p class="text-slate-400 text-xs mt-1">Enter your assigned passkey to unlock studio tools.</p>
+            </div>
+            <div class="space-y-3">
+                <input type="password" id="auth-passcode" placeholder="Enter Access Code..." class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-center text-sm focus:border-amber-400 outline-none">
+                <button onclick="verifyAccess()" class="w-full bg-amber-500 text-slate-950 font-bold py-3 rounded-lg hover:bg-amber-400 transition text-sm shadow-xl">
+                    Unlock Studio
+                </button>
+                <p id="auth-error" class="text-rose-400 text-xs hidden">Invalid passkey or your 30-day access has expired.</p>
+            </div>
+            <div class="border-t border-slate-800 pt-4 text-[11px] text-slate-500">
+                To purchase or renew 30-day access, contact <span class="text-amber-400">cwhomeky@gmail.com</span>
+            </div>
+        </div>
+    </div>
 
-    function verifyAccess() {
-        const inputKey = document.getElementById('auth-passcode').value.trim();
-        const errorEl = document.getElementById('auth-error');
+    <!-- MAIN STUDIO WORKSPACE (HIDDEN UNTIL UNLOCKED) -->
+    <div id="studio-workspace" class="hidden">
+        
+        <header class="glass-card border-b border-slate-800 px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="font-luxury text-xl font-bold tracking-widest text-amber-400">CWHOMESKY</span>
+                <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">AUTHORIZED STUDIO</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+                <span id="access-timer-badge" class="text-slate-400">User: <strong class="text-amber-400">Admin</strong></span>
+                <button onclick="lockStudio()" class="bg-rose-500/20 text-rose-300 px-3 py-1 rounded border border-rose-500/30 font-semibold hover:bg-rose-500/30">Lock Studio</button>
+            </div>
+        </header>
 
-        // Check if Master Admin
-        if (inputKey === ADMIN_PASS) {
-            unlockStudio("Master Admin", "Unlimited Access");
-            return;
+        <div class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT CONTROLS PANEL (5 COLS) -->
+            <div class="lg:col-span-5 glass-card p-6 rounded-xl space-y-4 max-h-[85vh] overflow-y-auto text-xs">
+                
+                <h3 class="text-sm font-bold text-amber-400 border-b border-slate-700 pb-2">Graphic Studio Controls</h3>
+
+                <!-- Format Switcher -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setFormat('feed')" class="py-2 font-bold border border-slate-700 rounded hover:bg-slate-800">Feed (1:1)</button>
+                    <button onclick="setFormat('story')" class="py-2 font-bold border border-slate-700 rounded hover:bg-slate-800">Story (9:16)</button>
+                    <button onclick="setFormat('flyer')" class="py-2 font-bold border border-slate-700 rounded hover:bg-slate-800">Flyer (8.5x11)</button>
+                </div>
+
+                <!-- MLS Import -->
+                <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700 space-y-2">
+                    <label class="font-bold text-amber-400 uppercase block">⚡ MLS Import / Auto-Fill</label>
+                    <textarea id="mls-raw-input" rows="2" placeholder="Paste raw MLS copy..." class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white"></textarea>
+                    <button onclick="parseMLSData()" class="w-full bg-amber-500 text-slate-950 font-bold py-1.5 rounded hover:bg-amber-400 transition">Auto-Populate Specs</button>
+                </div>
+
+                <!-- Property Information Inputs -->
+                <div class="space-y-2">
+                    <input type="text" id="input-headline" value="Your Dream Build Lot in Scenic LaRue County!" placeholder="Headline" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">
+                    <input type="text" id="input-address" value="" placeholder="Address (Lot, City, State, Zip)" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="input-price" value="$49,000" placeholder="Price" class="p-2 bg-slate-800 border border-slate-700 rounded text-white">
+                        <input type="text" id="input-acres" value="0.68 AC" placeholder="Acreage" class="p-2 bg-slate-800 border border-slate-700 rounded text-white">
+                    </div>
+                    <textarea id="input-description" rows="2" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">Discover your opportunity to build the home of your dreams!</textarea>
+                </div>
+
+                <!-- Listing Photos Upload -->
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1">Upload Main Property Photos</label>
+                    <input type="file" id="image-upload" accept="image/*" multiple class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white">
+                </div>
+
+                <!-- Headshot Upload -->
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1">Upload Agent Headshot</label>
+                    <input type="file" id="headshot-upload" accept="image/*" class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white">
+                </div>
+
+                <button onclick="downloadAd()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-500 transition shadow-lg text-sm">
+                    Export High-Res PNG Graphic
+                </button>
+            </div>
+
+            <!-- RIGHT CANVAS PREVIEW (7 COLS) -->
+            <div class="lg:col-span-7 flex flex-col items-center justify-center glass-card p-6 rounded-xl min-h-[520px]">
+                <div id="ad-template" class="format-feed bg-slate-900 p-4 rounded-lg shadow-2xl flex flex-col justify-between text-center relative century-body text-white">
+                    
+                    <div id="badge-wrapper" class="draggable-element mb-1">
+                        <span class="bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase px-3 py-0.5 rounded-full shadow">NEW LISTING</span>
+                    </div>
+
+                    <div id="headline-wrapper" class="text-2xl script-headline text-amber-300 draggable-element my-1">
+                        Your Dream Build Lot in Scenic LaRue County!
+                    </div>
+
+                    <div id="address-wrapper" class="bg-slate-800 mx-2 py-1 px-3 rounded font-bold text-xs shadow draggable-element my-1">
+                        <span id="display-address">Lot 12, Hodgenville, KY 42748</span>
+                    </div>
+
+                    <div id="specs-wrapper" class="flex justify-around my-1 text-[11px] font-bold draggable-element">
+                        <span class="bg-slate-800/80 px-2 py-0.5 rounded" id="display-price">💲 Price: $49,000</span>
+                        <span class="bg-slate-800/80 px-2 py-0.5 rounded" id="display-acres">📐 Size: 0.68 AC</span>
+                    </div>
+
+                    <div id="image-container" class="w-full h-[180px] my-1 rounded border border-slate-700 bg-slate-950 flex items-center justify-center overflow-hidden">
+                        <span class="text-xs text-slate-500">Upload Photos in Panel</span>
+                    </div>
+
+                    <div id="desc-wrapper" class="bg-slate-800/60 p-2 rounded text-left text-[10px] leading-snug my-1 draggable-element">
+                        <p id="display-description">Discover your opportunity to build the home of your dreams!</p>
+                    </div>
+
+                    <div class="flex items-center justify-between border-t border-slate-700/50 pt-2 text-left">
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 rounded-full overflow-hidden border border-amber-400/50">
+                                <img id="ad-headshot" src="https://via.placeholder.com/100x100?text=Agent" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-slate-400">CWHOMESKY</p>
+                                <p class="text-[10px] font-bold text-white">Patrick C. Washington</p>
+                                <p class="text-[9px] text-amber-400">(502) 230-8636 | cwhomeky@gmail.com</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- AUTHENTICATION & ENGINE SCRIPT -->
+    <script>
+        // 1. MASTER ADMIN PASSWORD (UNLIMITED ACCESS)
+        const ADMIN_PASS = "ARCHER2026"; 
+
+        // 2. PER-USER 30-DAY PASSKEY DATABASE
+        const SUBSCRIBER_KEYS = {
+            "SMITH_PASSKEY_1": Date.now(),               // User 1 (Starts Today)
+            "JONES_PASSKEY_2": Date.parse("2026-08-01"), // User 2 (Started Aug 1)
+            "LEE_PASSKEY_3": Date.now()                  // User 3 (Starts Today)
+        };
+
+        function verifyAccess() {
+            const inputKey = document.getElementById('auth-passcode').value.trim();
+            const errorEl = document.getElementById('auth-error');
+
+            // Check Master Admin Key
+            if (inputKey === ADMIN_PASS) {
+                unlockStudio("Master Admin", "Unlimited Access");
+                return;
+            }
+
+            // Check Individual User Passkey
+            if (SUBSCRIBER_KEYS[inputKey]) {
+                const startDate = SUBSCRIBER_KEYS[inputKey];
+                const daysElapsed = (Date.now() - startDate) / (1000 * 60 * 60 * 24);
+
+                if (daysElapsed <= 30) {
+                    const daysLeft = Math.max(0, Math.ceil(30 - daysElapsed));
+                    unlockStudio(inputKey, `${daysLeft} Days Left`);
+                    return;
+                } else {
+                    errorEl.innerText = "Your 30-day access key has expired. Please contact Patrick to renew.";
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            errorEl.innerText = "Invalid passkey. Please check your key or request access.";
+            errorEl.classList.remove('hidden');
         }
 
-        // Check Individual User Key
-        if (SUBSCRIBER_KEYS[inputKey]) {
-            const startDate = SUBSCRIBER_KEYS[inputKey];
-            const daysElapsed = (Date.now() - startDate) / (1000 * 60 * 60 * 24);
+        function unlockStudio(userLabel, badgeText) {
+            document.getElementById('auth-lock-overlay').classList.add('hidden');
+            document.getElementById('studio-workspace').classList.remove('hidden');
+            document.getElementById('access-timer-badge').innerHTML = `User: <strong class="text-amber-400">${userLabel}</strong> | Status: <strong class="text-emerald-400">${badgeText}</strong>`;
+        }
 
-            // Active 30-Day Window Check
-            if (daysElapsed <= 30) {
-                const daysLeft = Math.max(0, Math.ceil(30 - daysElapsed));
-                unlockStudio(inputKey, `${daysLeft} Days Left`);
-                return;
-            } else {
-                errorEl.innerText = "Your 30-day access key has expired. Please contact Patrick to renew.";
-                errorEl.classList.remove('hidden');
-                return;
+        function lockStudio() {
+            document.getElementById('auth-lock-overlay').classList.remove('hidden');
+            document.getElementById('studio-workspace').classList.add('hidden');
+        }
+
+        // Studio Generator Logic
+        const sync = (inputId, displayId, prefix = '') => {
+            const element = document.getElementById(inputId);
+            if (element) {
+                element.addEventListener('input', (e) => {
+                    document.getElementById(displayId).innerText = prefix + e.target.value;
+                });
+            }
+        };
+        sync('input-headline', 'headline-wrapper');
+        sync('input-address', 'display-address');
+        sync('input-price', 'display-price', '💲 Price: ');
+        sync('input-acres', 'display-acres', '📐 Size: ');
+        sync('input-description', 'display-description');
+
+        function parseMLSData() {
+            const rawText = document.getElementById('mls-raw-input').value;
+            if (!rawText.trim()) return;
+            const lotMatch = rawText.match(/lot\s*#?\s*(\d+[A-Za-z]?)/i);
+            const lotNum = lotMatch ? `Lot ${lotMatch[1]}` : 'Lot --';
+            const cszMatch = rawText.match(/([A-Za-z\s]+),\s*([A-Z]{2})\s*(\d{5})/);
+            let address = lotNum;
+            if (cszMatch) address = `${lotNum}, ${cszMatch[1].trim()}, ${cszMatch[2].trim()} ${cszMatch[3].trim()}`;
+            document.getElementById('input-address').value = address;
+            document.getElementById('display-address').innerText = address;
+            const priceMatch = rawText.match(/\$\s*[\d,]+/);
+            if (priceMatch) {
+                document.getElementById('input-price').value = priceMatch[0];
+                document.getElementById('display-price').innerText = '💲 Price: ' + priceMatch[0];
             }
         }
 
-        // Invalid Key
-        errorEl.innerText = "Invalid passkey. Please check your key or request access.";
-        errorEl.classList.remove('hidden');
-    }
+        function setFormat(format) {
+            const template = document.getElementById('ad-template');
+            template.classList.remove('format-feed', 'format-story', 'format-flyer');
+            template.classList.add(`format-${format}`);
+        }
 
-    function unlockStudio(userLabel, badgeText) {
-        document.getElementById('auth-lock-overlay').classList.add('hidden');
-        document.getElementById('studio-workspace').classList.remove('hidden');
-        document.getElementById('access-timer-badge').innerHTML = `User: <strong class="text-amber-400">${userLabel}</strong> | Status: <strong class="text-emerald-400">${badgeText}</strong>`;
-    }
+        document.getElementById('headshot-upload').addEventListener('change', function(e) {
+            if (e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (ev) => { document.getElementById('ad-headshot').src = ev.target.result; };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
 
-    function lockStudio() {
-        document.getElementById('auth-lock-overlay').classList.remove('hidden');
-        document.getElementById('studio-workspace').classList.add('hidden');
-    }
-</script>
+        function downloadAd() {
+            const element = document.getElementById('ad-template');
+            html2canvas(element, { scale: 3 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'cwhomesky-graphic.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
