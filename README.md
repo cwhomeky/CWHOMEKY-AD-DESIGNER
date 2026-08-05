@@ -146,7 +146,7 @@
                             <div>
                                 <p class="text-[9px] text-slate-400">CWHOMESKY</p>
                                 <p class="text-[10px] font-bold text-white">Patrick C. Washington</p>
-                                <p class="text-[9px] text-amber-400">(502) 230-8636 | cwhomeky@gmail.com</p>
+                                <p class="text-[9px] text-amber-400">(502) 230-5113 | cwhomeky@gmail.com</p>
                             </div>
                         </div>
                     </div>
