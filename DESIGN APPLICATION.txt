@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CWHOMESKY | Studio Graphic Engine</title>
+    <title>CWHOMESKY | All-In-One Marketing & Graphic Studio</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- html2canvas -->
@@ -21,7 +21,6 @@
         .format-story { width: 340px; height: 600px; }
         .format-flyer { width: 420px; height: 540px; }
 
-        /* Drag-and-Drop Active Target Styling */
         .drop-target-active {
             outline: 3px dashed #f59e0b !important;
             outline-offset: -4px;
@@ -39,7 +38,7 @@
             </div>
             <div>
                 <h2 class="font-luxury text-2xl font-bold text-white">Private Studio Access</h2>
-                <p class="text-slate-400 text-xs mt-1">Enter your assigned passkey to unlock studio tools.</p>
+                <p class="text-slate-400 text-xs mt-1">Enter your passkey to unlock all studio tools.</p>
             </div>
             <div class="space-y-3">
                 <input type="password" id="auth-passcode" placeholder="Enter Access Code..." class="w-full p-3 bg-slate-900 border border-slate-700 rounded-lg text-white text-center text-sm focus:border-amber-400 outline-none">
@@ -57,7 +56,7 @@
         <header class="glass-card border-b border-slate-800 px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <span class="font-luxury text-xl font-bold tracking-widest text-amber-400">CWHOMESKY</span>
-                <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">STUDIO EDITOR</span>
+                <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">PRO MARKETING SUITE</span>
             </div>
             <div class="flex items-center gap-4 text-xs">
                 <span id="access-timer-badge" class="text-slate-400">User: <strong class="text-amber-400">Admin</strong></span>
@@ -70,23 +69,23 @@
             <!-- LEFT CONTROLS PANEL -->
             <div class="lg:col-span-5 glass-card p-6 rounded-xl space-y-4 max-h-[85vh] overflow-y-auto text-xs">
                 
-                <h3 class="text-sm font-bold text-amber-400 border-b border-slate-700 pb-2">Layout & Photo Placement</h3>
+                <h3 class="text-sm font-bold text-amber-400 border-b border-slate-700 pb-2">Studio Controls & Generators</h3>
 
-                <!-- Format Switcher -->
+                <!-- Canvas Format Switcher -->
                 <div class="grid grid-cols-3 gap-2">
                     <button onclick="setFormat('feed')" class="py-2 font-bold border border-slate-700 rounded hover:bg-slate-800">Feed (1:1)</button>
                     <button onclick="setFormat('story')" class="py-2 font-bold border border-slate-700 rounded hover:bg-slate-800">Story (9:16)</button>
                     <button onclick="setFormat('flyer')" class="py-2 font-bold border border-slate-700 rounded hover:bg-slate-800">Flyer (8.5x11)</button>
                 </div>
 
-                <!-- MLS Import -->
+                <!-- MLS Data Parser -->
                 <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700 space-y-2">
                     <label class="font-bold text-amber-400 uppercase block">⚡ MLS Import / Auto-Fill</label>
                     <textarea id="mls-raw-input" rows="2" placeholder="Paste raw MLS copy..." class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white"></textarea>
-                    <button onclick="parseMLSData()" class="w-full bg-amber-500 text-slate-950 font-bold py-1.5 rounded hover:bg-amber-400 transition">Auto-Populate Specs</button>
+                    <button onclick="parseMLSData()" class="w-full bg-amber-500 text-slate-950 font-bold py-1.5 rounded hover:bg-amber-400 transition">Auto-Populate Specs & Ad Copy</button>
                 </div>
 
-                <!-- Property Inputs -->
+                <!-- Property Details Form -->
                 <div class="space-y-2">
                     <input type="text" id="input-headline" value="Your Dream Build Lot in Scenic LaRue County!" placeholder="Headline" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">
                     <input type="text" id="input-address" value="Lot 12, Hodgenville, KY 42748" placeholder="Address" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">
@@ -97,15 +96,14 @@
                     <textarea id="input-description" rows="2" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">Discover your opportunity to build the home of your dreams!</textarea>
                 </div>
 
-                <!-- Photo Upload & Drop Zone Area -->
-                <div id="control-drop-zone" class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-lg space-y-3 transition">
+                <!-- Drag & Drop Photo Panel -->
+                <div id="control-drop-zone" class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-lg space-y-3">
                     <label class="block font-bold text-amber-400">📷 Drag & Drop Listing Photos Here</label>
                     <div class="text-[11px] text-slate-400 border-2 border-dashed border-amber-500/40 p-3 rounded text-center">
-                        Drag photos anywhere on this box OR onto the canvas template on the right.
+                        Drop photos here or onto the canvas preview.
                     </div>
                     <input type="file" id="image-upload" accept="image/*" multiple class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white cursor-pointer">
                     
-                    <!-- Selected Photo Controls -->
                     <div id="photo-controls" class="hidden space-y-2 pt-2 border-t border-slate-700">
                         <p class="font-bold text-slate-300 text-[11px]">Modify Selected Photo Layer:</p>
                         <div class="grid grid-cols-2 gap-2">
@@ -122,31 +120,38 @@
                             <button onclick="moveLayerZ(1)" class="w-1/2 bg-slate-800 py-1 rounded text-slate-300 border border-slate-700 hover:bg-slate-700">Bring Forward</button>
                             <button onclick="moveLayerZ(-1)" class="w-1/2 bg-slate-800 py-1 rounded text-slate-300 border border-slate-700 hover:bg-slate-700">Send Backward</button>
                         </div>
-                        <button onclick="deleteSelectedPhoto()" class="w-full bg-rose-600/80 hover:bg-rose-600 text-white py-1 rounded text-xs font-bold">Remove Photo Layer</button>
+                        <button onclick="deleteSelectedPhoto()" class="w-full bg-rose-600/80 hover:bg-rose-600 text-white py-1 rounded text-xs font-bold">Remove Layer</button>
                     </div>
                 </div>
 
-                <!-- Headshot Upload -->
+                <!-- Agent Headshot Upload -->
                 <div>
                     <label class="block font-bold text-slate-300 mb-1">Upload Agent Headshot</label>
                     <input type="file" id="headshot-upload" accept="image/*" class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white cursor-pointer">
                 </div>
 
+                <!-- Automated Ad Copy & Script Generators -->
+                <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-700 space-y-2">
+                    <label class="font-bold text-amber-400 uppercase block">✍️ Automated Social Copy & Video Scripts</label>
+                    <button onclick="generateAdCopy()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded transition">Generate Social Post & Reel Script</button>
+                    <textarea id="generated-ad-copy" rows="4" placeholder="Generated caption will appear here..." class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-slate-300 text-[11px]"></textarea>
+                    <button onclick="copyAdText()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-bold py-1 rounded">Copy Text to Clipboard</button>
+                </div>
+
                 <button onclick="downloadAd()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-500 transition shadow-lg text-sm">
-                    Export High-Res Graphic
+                    Export High-Res PNG Graphic
                 </button>
             </div>
 
             <!-- RIGHT CANVAS PREVIEW -->
             <div class="lg:col-span-7 flex flex-col items-center justify-center glass-card p-6 rounded-xl min-h-[560px]">
                 
-                <!-- CANVAS TEMPLATE LAYER (ALSO DRAG AND DROP TARGET) -->
                 <div id="ad-template" class="format-feed bg-slate-900 rounded-lg shadow-2xl relative overflow-hidden text-white border border-slate-700 transition">
                     
-                    <!-- DYNAMIC PHOTOS CONTAINER LAYER -->
+                    <!-- Dynamic Layer Container -->
                     <div id="photo-layers-wrapper" class="absolute inset-0 w-full h-full pointer-events-auto"></div>
 
-                    <!-- OVERLAY TEXT ELEMENTS LAYER -->
+                    <!-- Overlay Elements -->
                     <div class="absolute inset-0 p-4 flex flex-col justify-between pointer-events-none">
                         
                         <div class="space-y-1">
@@ -170,7 +175,7 @@
                             </div>
                         </div>
 
-                        <!-- AGENT FOOTER LAYER -->
+                        <!-- Agent Footer -->
                         <div class="draggable-layer pointer-events-auto bottom-2 right-2 bg-slate-950/90 p-2 rounded-lg border border-slate-700 flex items-center gap-2">
                             <div class="w-9 h-9 rounded-full overflow-hidden border border-amber-400/50 bg-slate-800">
                                 <img id="ad-headshot" src="https://via.placeholder.com/100x100?text=Agent" class="w-full h-full object-cover">
@@ -185,7 +190,7 @@
                     </div>
                 </div>
 
-                <p class="text-[11px] text-slate-400 mt-3">💡 <strong>Tip:</strong> Drag and drop images directly onto the template. Click any element to drag, relocate, or resize.</p>
+                <p class="text-[11px] text-slate-400 mt-3">💡 Drag images or text elements anywhere on the canvas to customize your visual layout.</p>
             </div>
 
         </div>
@@ -210,7 +215,6 @@
             document.getElementById('studio-workspace').classList.add('hidden');
         }
 
-        // Live Input Sync
         const sync = (inputId, displayId, prefix = '') => {
             const el = document.getElementById(inputId);
             if (el) {
@@ -239,6 +243,26 @@
                 document.getElementById('input-price').value = priceMatch[0];
                 document.getElementById('display-price').innerText = '💲 Price: ' + priceMatch[0];
             }
+            generateAdCopy();
+        }
+
+        function generateAdCopy() {
+            const headline = document.getElementById('input-headline').value;
+            const address = document.getElementById('input-address').value;
+            const price = document.getElementById('input-price').value;
+            const acres = document.getElementById('input-acres').value;
+            const desc = document.getElementById('input-description').value;
+
+            const caption = `🏡 NEW LISTING ALERT!\n\n${headline}\n\n📍 Location: ${address}\n💰 Price: ${price}\n📐 Lot Size: ${acres}\n\n${desc}\n\n📩 DM or call Patrick C. Washington at (502) 230-8636 for more details!\n\n#RealEstate #KentuckyHomes #HardinCounty #PenningtonProperties #CWHOMESKY`;
+
+            document.getElementById('generated-ad-copy').value = caption;
+        }
+
+        function copyAdText() {
+            const copyText = document.getElementById('generated-ad-copy');
+            copyText.select();
+            document.execCommand('copy');
+            alert("Copy saved to clipboard!");
         }
 
         function setFormat(format) {
@@ -247,7 +271,6 @@
             template.classList.add(`format-${format}`);
         }
 
-        // HANDLE FILES PROCESSOR
         function handleFiles(files) {
             if (!files || files.length === 0) return;
             Array.from(files).forEach((file) => {
@@ -258,12 +281,10 @@
             });
         }
 
-        // MANUAL FILE INPUT HANDLER
         document.getElementById('image-upload').addEventListener('change', function(e) {
             handleFiles(e.target.files);
         });
 
-        // DRAG AND DROP EVENT ENGINE FOR CANVAS AND CONTROL PANEL
         const dropTargets = [document.getElementById('ad-template'), document.getElementById('control-drop-zone')];
 
         dropTargets.forEach(target => {
@@ -281,8 +302,7 @@
 
             target.addEventListener('drop', (e) => {
                 const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
+                handleFiles(dt.files);
             }, false);
         });
 
@@ -291,7 +311,6 @@
             e.stopPropagation();
         }
 
-        // CREATE MOVEABLE PHOTO LAYER
         function createPhotoLayer(src) {
             const wrapper = document.getElementById('photo-layers-wrapper');
             const imgContainer = document.createElement('div');
@@ -331,7 +350,6 @@
             }
         }
 
-        // PHOTO MODIFIER CONTROLS
         document.getElementById('photo-scale').addEventListener('input', (e) => {
             if (!activeSelectedLayer) return;
             activeSelectedLayer.dataset.scale = e.target.value;
@@ -363,7 +381,6 @@
             }
         }
 
-        // DRAG & DROP POSITIONING ENGINE FOR CANVAS LAYERS
         function makeElementDraggable(el) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             el.onmousedown = dragMouseDown;
@@ -392,17 +409,14 @@
             }
         }
 
-        // INITIALIZE DRAGGABLE TEXT LAYERS
         document.querySelectorAll('.draggable-layer').forEach(el => makeElementDraggable(el));
 
-        // HEADSHOT UPLOAD
         document.getElementById('headshot-upload').addEventListener('change', function(e) {
             if (e.target.files[0]) {
                 document.getElementById('ad-headshot').src = URL.createObjectURL(e.target.files[0]);
             }
         });
 
-        // EXPORT FUNCTION
         function downloadAd() {
             if (activeSelectedLayer) selectPhotoLayer(null);
             const element = document.getElementById('ad-template');
