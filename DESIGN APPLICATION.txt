@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CWHOMESKY | Private Ad & Graphic Studio</title>
+    <title>CWHOMESKY | Studio Graphic Engine</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- html2canvas -->
@@ -15,10 +15,11 @@
         .font-luxury { font-family: 'Cinzel', serif; }
         .script-headline { font-family: 'Great Vibes', cursive; }
         .glass-card { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .draggable-element { cursor: move; user-select: none; }
-        .format-feed { width: 420px; min-height: 420px; }
-        .format-story { width: 340px; min-height: 600px; }
-        .format-flyer { width: 420px; min-height: 540px; }
+        .draggable-layer { cursor: move; user-select: none; position: absolute; touch-action: none; }
+        .layer-selected { outline: 2px dashed #f59e0b; outline-offset: 2px; }
+        .format-feed { width: 420px; height: 420px; }
+        .format-story { width: 340px; height: 600px; }
+        .format-flyer { width: 420px; height: 540px; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -38,10 +39,7 @@
                 <button onclick="verifyAccess()" class="w-full bg-amber-500 text-slate-950 font-bold py-3 rounded-lg hover:bg-amber-400 transition text-sm shadow-xl">
                     Unlock Studio
                 </button>
-                <p id="auth-error" class="text-rose-400 text-xs hidden">Invalid passkey or your 30-day access has expired.</p>
-            </div>
-            <div class="border-t border-slate-800 pt-4 text-[11px] text-slate-500">
-                To purchase or renew 30-day access, contact <span class="text-amber-400">cwhomeky@gmail.com</span>
+                <p id="auth-error" class="text-rose-400 text-xs hidden">Invalid passkey.</p>
             </div>
         </div>
     </div>
@@ -52,7 +50,7 @@
         <header class="glass-card border-b border-slate-800 px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <span class="font-luxury text-xl font-bold tracking-widest text-amber-400">CWHOMESKY</span>
-                <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">AUTHORIZED STUDIO</span>
+                <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">STUDIO EDITOR</span>
             </div>
             <div class="flex items-center gap-4 text-xs">
                 <span id="access-timer-badge" class="text-slate-400">User: <strong class="text-amber-400">Admin</strong></span>
@@ -65,7 +63,7 @@
             <!-- LEFT CONTROLS PANEL -->
             <div class="lg:col-span-5 glass-card p-6 rounded-xl space-y-4 max-h-[85vh] overflow-y-auto text-xs">
                 
-                <h3 class="text-sm font-bold text-amber-400 border-b border-slate-700 pb-2">Graphic Studio Controls</h3>
+                <h3 class="text-sm font-bold text-amber-400 border-b border-slate-700 pb-2">Layout & Photo Placement</h3>
 
                 <!-- Format Switcher -->
                 <div class="grid grid-cols-3 gap-2">
@@ -92,116 +90,109 @@
                     <textarea id="input-description" rows="2" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">Discover your opportunity to build the home of your dreams!</textarea>
                 </div>
 
-                <!-- Listing Photos Upload -->
-                <div class="bg-slate-900/40 p-3 rounded-lg border border-slate-800">
-                    <label class="block font-bold text-slate-300 mb-1">Upload Main Property Photos</label>
+                <!-- Photo Upload & Dynamic Placement -->
+                <div class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-lg space-y-3">
+                    <label class="block font-bold text-amber-400">📷 Upload Listing Photos</label>
                     <input type="file" id="image-upload" accept="image/*" multiple class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white cursor-pointer">
-                    <p class="text-[10px] text-slate-500 mt-1">Select one or multiple photos. Click a thumbnail below to switch active main image.</p>
-                    <div id="photo-thumbnails" class="flex gap-2 mt-2 overflow-x-auto pb-1 min-h-[48px]"></div>
+                    
+                    <!-- Selected Photo Manipulator Controls -->
+                    <div id="photo-controls" class="hidden space-y-2 pt-2 border-t border-slate-700">
+                        <p class="font-bold text-slate-300 text-[11px]">Modify Selected Photo Layer:</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 block">Resize / Scale</label>
+                                <input type="range" id="photo-scale" min="50" max="300" value="100" class="w-full">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 block">Rotation</label>
+                                <input type="range" id="photo-rotate" min="-180" max="180" value="0" class="w-full">
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="moveLayerZ(1)" class="w-1/2 bg-slate-800 py-1 rounded text-slate-300 border border-slate-700 hover:bg-slate-700">Bring Forward</button>
+                            <button onclick="moveLayerZ(-1)" class="w-1/2 bg-slate-800 py-1 rounded text-slate-300 border border-slate-700 hover:bg-slate-700">Send Backward</button>
+                        </div>
+                        <button onclick="deleteSelectedPhoto()" class="w-full bg-rose-600/80 hover:bg-rose-600 text-white py-1 rounded text-xs font-bold">Remove Photo Layer</button>
+                    </div>
                 </div>
 
                 <!-- Headshot Upload -->
-                <div class="bg-slate-900/40 p-3 rounded-lg border border-slate-800">
+                <div>
                     <label class="block font-bold text-slate-300 mb-1">Upload Agent Headshot</label>
                     <input type="file" id="headshot-upload" accept="image/*" class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white cursor-pointer">
                 </div>
 
                 <button onclick="downloadAd()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-500 transition shadow-lg text-sm">
-                    Export High-Res PNG Graphic
+                    Export High-Res Graphic
                 </button>
             </div>
 
             <!-- RIGHT CANVAS PREVIEW -->
-            <div class="lg:col-span-7 flex flex-col items-center justify-center glass-card p-6 rounded-xl min-h-[520px]">
-                <div id="ad-template" class="format-feed bg-slate-900 p-4 rounded-lg shadow-2xl flex flex-col justify-between text-center relative century-body text-white">
+            <div class="lg:col-span-7 flex flex-col items-center justify-center glass-card p-6 rounded-xl min-h-[560px]">
+                
+                <!-- CANVAS TEMPLATE LAYER -->
+                <div id="ad-template" class="format-feed bg-slate-900 rounded-lg shadow-2xl relative overflow-hidden text-white border border-slate-700">
                     
-                    <div id="badge-wrapper" class="draggable-element mb-1">
-                        <span class="bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase px-3 py-0.5 rounded-full shadow">NEW LISTING</span>
-                    </div>
+                    <!-- DYNAMIC PHOTOS CONTAINER LAYER -->
+                    <div id="photo-layers-wrapper" class="absolute inset-0 w-full h-full pointer-events-auto"></div>
 
-                    <div id="headline-wrapper" class="text-2xl script-headline text-amber-300 draggable-element my-1">
-                        Your Dream Build Lot in Scenic LaRue County!
-                    </div>
-
-                    <div id="address-wrapper" class="bg-slate-800 mx-2 py-1 px-3 rounded font-bold text-xs shadow draggable-element my-1">
-                        <span id="display-address">Lot 12, Hodgenville, KY 42748</span>
-                    </div>
-
-                    <div id="specs-wrapper" class="flex justify-around my-1 text-[11px] font-bold draggable-element">
-                        <span class="bg-slate-800/80 px-2 py-0.5 rounded" id="display-price">💲 Price: $49,000</span>
-                        <span class="bg-slate-800/80 px-2 py-0.5 rounded" id="display-acres">📐 Size: 0.68 AC</span>
-                    </div>
-
-                    <!-- PHOTO DISPLAY CONTAINER -->
-                    <div id="image-container" class="w-full h-[180px] my-1 rounded border border-slate-700 bg-slate-950 flex items-center justify-center overflow-hidden relative">
-                        <img id="main-ad-photo" src="" class="w-full h-full object-cover hidden" alt="Property Photo">
-                        <span id="photo-placeholder" class="text-xs text-slate-500">Upload Photos in Panel</span>
-                    </div>
-
-                    <div id="desc-wrapper" class="bg-slate-800/60 p-2 rounded text-left text-[10px] leading-snug my-1 draggable-element">
-                        <p id="display-description">Discover your opportunity to build the home of your dreams!</p>
-                    </div>
-
-                    <div class="flex items-center justify-between border-t border-slate-700/50 pt-2 text-left">
-                        <div class="flex items-center gap-2">
-                            <div class="w-10 h-10 rounded-full overflow-hidden border border-amber-400/50 bg-slate-800">
-                                <img id="ad-headshot" src="https://via.placeholder.com/100x100?text=Agent" class="w-full h-full object-cover">
+                    <!-- OVERLAY TEXT ELEMENTS LAYER -->
+                    <div class="absolute inset-0 p-4 flex flex-col justify-between pointer-events-none">
+                        
+                        <div class="space-y-1">
+                            <div id="badge-wrapper" class="draggable-layer pointer-events-auto top-3 left-3">
+                                <span class="bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase px-3 py-0.5 rounded-full shadow">NEW LISTING</span>
                             </div>
-                            <div>
-                                <p class="text-[9px] text-slate-400">CWHOMESKY</p>
-                                <p class="text-[10px] font-bold text-white">Patrick C. Washington</p>
-                                <p class="text-[9px] text-amber-400">(502) 230-8636 | cwhomeky@gmail.com</p>
+
+                            <div id="headline-wrapper" class="draggable-layer pointer-events-auto top-10 left-3 text-xl script-headline text-amber-300 bg-slate-950/60 px-2 py-0.5 rounded">
+                                Your Dream Build Lot in Scenic LaRue County!
                             </div>
                         </div>
-                    </div>
 
+                        <div class="space-y-1">
+                            <div id="address-wrapper" class="draggable-layer pointer-events-auto bottom-24 left-3 bg-slate-900/90 py-1 px-3 rounded font-bold text-xs shadow border border-slate-700">
+                                <span id="display-address">Lot 12, Hodgenville, KY 42748</span>
+                            </div>
+
+                            <div id="specs-wrapper" class="draggable-layer pointer-events-auto bottom-16 left-3 flex gap-2 text-[11px] font-bold">
+                                <span class="bg-slate-900/90 px-2 py-0.5 rounded border border-slate-700" id="display-price">💲 Price: $49,000</span>
+                                <span class="bg-slate-900/90 px-2 py-0.5 rounded border border-slate-700" id="display-acres">📐 Size: 0.68 AC</span>
+                            </div>
+                        </div>
+
+                        <!-- AGENT FOOTER LAYER -->
+                        <div class="draggable-layer pointer-events-auto bottom-2 right-2 bg-slate-950/90 p-2 rounded-lg border border-slate-700 flex items-center gap-2">
+                            <div class="w-9 h-9 rounded-full overflow-hidden border border-amber-400/50 bg-slate-800">
+                                <img id="ad-headshot" src="https://via.placeholder.com/100x100?text=Agent" class="w-full h-full object-cover">
+                            </div>
+                            <div class="text-left leading-tight">
+                                <p class="text-[8px] text-slate-400">CWHOMESKY</p>
+                                <p class="text-[9.5px] font-bold text-white">Patrick C. Washington</p>
+                                <p class="text-[8px] text-amber-400">(502) 230-8636</p>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+
+                <p class="text-[11px] text-slate-400 mt-3">💡 <strong>Tip:</strong> Click and drag <u>any</u> text box or photo to relocate it anywhere inside the graphic.</p>
             </div>
 
         </div>
     </div>
 
-    <!-- ENGINE SCRIPT -->
     <script>
         const ADMIN_PASS = "ARCHER2026"; 
-        const SUBSCRIBER_KEYS = {
-            "SMITH_PASSKEY_1": Date.now(),
-            "JONES_PASSKEY_2": Date.parse("2026-08-01"),
-            "LEE_PASSKEY_3": Date.now()
-        };
+        let activeSelectedLayer = null;
 
         function verifyAccess() {
             const inputKey = document.getElementById('auth-passcode').value.trim();
-            const errorEl = document.getElementById('auth-error');
-
             if (inputKey === ADMIN_PASS) {
-                unlockStudio("Master Admin", "Unlimited Access");
-                return;
+                document.getElementById('auth-lock-overlay').classList.add('hidden');
+                document.getElementById('studio-workspace').classList.remove('hidden');
+            } else {
+                document.getElementById('auth-error').classList.remove('hidden');
             }
-
-            if (SUBSCRIBER_KEYS[inputKey]) {
-                const startDate = SUBSCRIBER_KEYS[inputKey];
-                const daysElapsed = (Date.now() - startDate) / (1000 * 60 * 60 * 24);
-
-                if (daysElapsed <= 30) {
-                    const daysLeft = Math.max(0, Math.ceil(30 - daysElapsed));
-                    unlockStudio(inputKey, `${daysLeft} Days Left`);
-                    return;
-                } else {
-                    errorEl.innerText = "Your 30-day access key has expired.";
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-            }
-
-            errorEl.innerText = "Invalid passkey.";
-            errorEl.classList.remove('hidden');
-        }
-
-        function unlockStudio(userLabel, badgeText) {
-            document.getElementById('auth-lock-overlay').classList.add('hidden');
-            document.getElementById('studio-workspace').classList.remove('hidden');
-            document.getElementById('access-timer-badge').innerHTML = `User: <strong class="text-amber-400">${userLabel}</strong> | Status: <strong class="text-emerald-400">${badgeText}</strong>`;
         }
 
         function lockStudio() {
@@ -211,9 +202,9 @@
 
         // Live Input Sync
         const sync = (inputId, displayId, prefix = '') => {
-            const element = document.getElementById(inputId);
-            if (element) {
-                element.addEventListener('input', (e) => {
+            const el = document.getElementById(inputId);
+            if (el) {
+                el.addEventListener('input', (e) => {
                     document.getElementById(displayId).innerText = prefix + e.target.value;
                 });
             }
@@ -222,7 +213,6 @@
         sync('input-address', 'display-address');
         sync('input-price', 'display-price', '💲 Price: ');
         sync('input-acres', 'display-acres', '📐 Size: ');
-        sync('input-description', 'display-description');
 
         function parseMLSData() {
             const rawText = document.getElementById('mls-raw-input').value;
@@ -247,66 +237,132 @@
             template.classList.add(`format-${format}`);
         }
 
-        // DIRECT PHOTO DISPLAY CONTROLLER
-        function setMainImage(src) {
-            const mainImg = document.getElementById('main-ad-photo');
-            const placeholder = document.getElementById('photo-placeholder');
-            
-            mainImg.src = src;
-            mainImg.classList.remove('hidden');
-            if (placeholder) placeholder.classList.add('hidden');
-        }
-
-        // PROPERTY PHOTO UPLOADER
+        // PHOTO UPLOAD ENGINE
         document.getElementById('image-upload').addEventListener('change', function(e) {
             const files = e.target.files;
-            const thumbContainer = document.getElementById('photo-thumbnails');
-            thumbContainer.innerHTML = '';
-
             if (!files || files.length === 0) return;
 
-            Array.from(files).forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const imgUrl = event.target.result;
-                    
-                    // First image automatically loads as main ad display
-                    if (index === 0) {
-                        setMainImage(imgUrl);
-                    }
-
-                    // Create selectable thumbnail box
-                    const thumb = document.createElement('img');
-                    thumb.src = imgUrl;
-                    thumb.className = 'w-12 h-12 object-cover rounded border-2 border-slate-700 hover:border-amber-400 cursor-pointer transition flex-shrink-0';
-                    thumb.onclick = function() { setMainImage(imgUrl); };
-                    thumbContainer.appendChild(thumb);
-                };
-                reader.readAsDataURL(file);
+            Array.from(files).forEach((file) => {
+                const imgUrl = URL.createObjectURL(file);
+                createPhotoLayer(imgUrl);
             });
         });
 
-        // HEADSHOT UPLOADER
+        function createPhotoLayer(src) {
+            const wrapper = document.getElementById('photo-layers-wrapper');
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'draggable-layer layer-photo border border-transparent';
+            imgContainer.style.left = '30px';
+            imgContainer.style.top = '30px';
+            imgContainer.style.zIndex = '1';
+
+            const img = document.createElement('img');
+            img.src = src;
+            img.className = 'w-48 h-auto pointer-events-none rounded shadow-lg';
+            imgContainer.appendChild(img);
+
+            imgContainer.dataset.scale = "100";
+            imgContainer.dataset.rotate = "0";
+
+            imgContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectPhotoLayer(imgContainer);
+            });
+
+            makeElementDraggable(imgContainer);
+            wrapper.appendChild(imgContainer);
+            selectPhotoLayer(imgContainer);
+        }
+
+        function selectPhotoLayer(layer) {
+            document.querySelectorAll('.layer-photo').forEach(l => l.classList.remove('layer-selected'));
+            activeSelectedLayer = layer;
+            if (layer) {
+                layer.classList.add('layer-selected');
+                document.getElementById('photo-controls').classList.remove('hidden');
+                document.getElementById('photo-scale').value = layer.dataset.scale || 100;
+                document.getElementById('photo-rotate').value = layer.dataset.rotate || 0;
+            } else {
+                document.getElementById('photo-controls').classList.add('hidden');
+            }
+        }
+
+        // PHOTO MODIFIER CONTROLS
+        document.getElementById('photo-scale').addEventListener('input', (e) => {
+            if (!activeSelectedLayer) return;
+            activeSelectedLayer.dataset.scale = e.target.value;
+            applyLayerTransforms(activeSelectedLayer);
+        });
+
+        document.getElementById('photo-rotate').addEventListener('input', (e) => {
+            if (!activeSelectedLayer) return;
+            activeSelectedLayer.dataset.rotate = e.target.value;
+            applyLayerTransforms(activeSelectedLayer);
+        });
+
+        function applyLayerTransforms(layer) {
+            const scale = (layer.dataset.scale || 100) / 100;
+            const rotate = layer.dataset.rotate || 0;
+            layer.style.transform = `scale(${scale}) rotate(${rotate}deg)`;
+        }
+
+        function moveLayerZ(direction) {
+            if (!activeSelectedLayer) return;
+            let currentZ = parseInt(activeSelectedLayer.style.zIndex || 1);
+            activeSelectedLayer.style.zIndex = Math.max(1, currentZ + direction);
+        }
+
+        function deleteSelectedPhoto() {
+            if (activeSelectedLayer) {
+                activeSelectedLayer.remove();
+                selectPhotoLayer(null);
+            }
+        }
+
+        // DRAG & DROP ENGINE
+        function makeElementDraggable(el) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            el.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                el.style.top = (el.offsetTop - pos2) + "px";
+                el.style.left = (el.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // INITIALIZE DRAGGABLE TEXT LAYERS
+        document.querySelectorAll('.draggable-layer').forEach(el => makeElementDraggable(el));
+
+        // HEADSHOT UPLOAD
         document.getElementById('headshot-upload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('ad-headshot').src = event.target.result;
-                };
-                reader.readAsDataURL(file);
+            if (e.target.files[0]) {
+                document.getElementById('ad-headshot').src = URL.createObjectURL(e.target.files[0]);
             }
         });
 
-        // EXPORT FUNCTION WITH CORS & CANVAS FIXES
+        // EXPORT FUNCTION
         function downloadAd() {
+            if (activeSelectedLayer) selectPhotoLayer(null);
             const element = document.getElementById('ad-template');
-            html2canvas(element, { 
-                scale: 3,
-                useCORS: true,
-                allowTaint: true,
-                logging: false
-            }).then(canvas => {
+            html2canvas(element, { scale: 3, useCORS: true, allowTaint: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'cwhomesky-graphic.png';
                 link.href = canvas.toDataURL('image/png');
