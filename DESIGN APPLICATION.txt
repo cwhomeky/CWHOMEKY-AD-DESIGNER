@@ -46,7 +46,7 @@
         </div>
     </div>
 
-    <!-- MAIN STUDIO WORKSPACE (HIDDEN UNTIL UNLOCKED) -->
+    <!-- MAIN STUDIO WORKSPACE -->
     <div id="studio-workspace" class="hidden">
         
         <header class="glass-card border-b border-slate-800 px-6 py-4 flex justify-between items-center">
@@ -62,7 +62,7 @@
 
         <div class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- LEFT CONTROLS PANEL (5 COLS) -->
+            <!-- LEFT CONTROLS PANEL -->
             <div class="lg:col-span-5 glass-card p-6 rounded-xl space-y-4 max-h-[85vh] overflow-y-auto text-xs">
                 
                 <h3 class="text-sm font-bold text-amber-400 border-b border-slate-700 pb-2">Graphic Studio Controls</h3>
@@ -81,10 +81,10 @@
                     <button onclick="parseMLSData()" class="w-full bg-amber-500 text-slate-950 font-bold py-1.5 rounded hover:bg-amber-400 transition">Auto-Populate Specs</button>
                 </div>
 
-                <!-- Property Information Inputs -->
+                <!-- Property Inputs -->
                 <div class="space-y-2">
                     <input type="text" id="input-headline" value="Your Dream Build Lot in Scenic LaRue County!" placeholder="Headline" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">
-                    <input type="text" id="input-address" value="" placeholder="Address (Lot, City, State, Zip)" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">
+                    <input type="text" id="input-address" value="Lot 12, Hodgenville, KY 42748" placeholder="Address" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">
                     <div class="grid grid-cols-2 gap-2">
                         <input type="text" id="input-price" value="$49,000" placeholder="Price" class="p-2 bg-slate-800 border border-slate-700 rounded text-white">
                         <input type="text" id="input-acres" value="0.68 AC" placeholder="Acreage" class="p-2 bg-slate-800 border border-slate-700 rounded text-white">
@@ -93,16 +93,17 @@
                 </div>
 
                 <!-- Listing Photos Upload -->
-                <div>
+                <div class="bg-slate-900/40 p-3 rounded-lg border border-slate-800">
                     <label class="block font-bold text-slate-300 mb-1">Upload Main Property Photos</label>
-                    <input type="file" id="image-upload" accept="image/*" multiple class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white">
-                    <div id="photo-thumbnails" class="flex gap-2 mt-2 overflow-x-auto pb-1"></div>
+                    <input type="file" id="image-upload" accept="image/*" multiple class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white cursor-pointer">
+                    <p class="text-[10px] text-slate-500 mt-1">Select one or multiple photos. Click a thumbnail below to switch active main image.</p>
+                    <div id="photo-thumbnails" class="flex gap-2 mt-2 overflow-x-auto pb-1 min-h-[48px]"></div>
                 </div>
 
                 <!-- Headshot Upload -->
-                <div>
+                <div class="bg-slate-900/40 p-3 rounded-lg border border-slate-800">
                     <label class="block font-bold text-slate-300 mb-1">Upload Agent Headshot</label>
-                    <input type="file" id="headshot-upload" accept="image/*" class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white">
+                    <input type="file" id="headshot-upload" accept="image/*" class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white cursor-pointer">
                 </div>
 
                 <button onclick="downloadAd()" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-500 transition shadow-lg text-sm">
@@ -110,7 +111,7 @@
                 </button>
             </div>
 
-            <!-- RIGHT CANVAS PREVIEW (7 COLS) -->
+            <!-- RIGHT CANVAS PREVIEW -->
             <div class="lg:col-span-7 flex flex-col items-center justify-center glass-card p-6 rounded-xl min-h-[520px]">
                 <div id="ad-template" class="format-feed bg-slate-900 p-4 rounded-lg shadow-2xl flex flex-col justify-between text-center relative century-body text-white">
                     
@@ -131,8 +132,10 @@
                         <span class="bg-slate-800/80 px-2 py-0.5 rounded" id="display-acres">📐 Size: 0.68 AC</span>
                     </div>
 
-                    <div id="image-container" class="w-full h-[180px] my-1 rounded border border-slate-700 bg-slate-950 flex items-center justify-center overflow-hidden">
-                        <span class="text-xs text-slate-500">Upload Photos in Panel</span>
+                    <!-- PHOTO DISPLAY CONTAINER -->
+                    <div id="image-container" class="w-full h-[180px] my-1 rounded border border-slate-700 bg-slate-950 flex items-center justify-center overflow-hidden relative">
+                        <img id="main-ad-photo" src="" class="w-full h-full object-cover hidden" alt="Property Photo">
+                        <span id="photo-placeholder" class="text-xs text-slate-500">Upload Photos in Panel</span>
                     </div>
 
                     <div id="desc-wrapper" class="bg-slate-800/60 p-2 rounded text-left text-[10px] leading-snug my-1 draggable-element">
@@ -141,7 +144,7 @@
 
                     <div class="flex items-center justify-between border-t border-slate-700/50 pt-2 text-left">
                         <div class="flex items-center gap-2">
-                            <div class="w-10 h-10 rounded-full overflow-hidden border border-amber-400/50">
+                            <div class="w-10 h-10 rounded-full overflow-hidden border border-amber-400/50 bg-slate-800">
                                 <img id="ad-headshot" src="https://via.placeholder.com/100x100?text=Agent" class="w-full h-full object-cover">
                             </div>
                             <div>
@@ -158,29 +161,24 @@
         </div>
     </div>
 
-    <!-- AUTHENTICATION & ENGINE SCRIPT -->
+    <!-- ENGINE SCRIPT -->
     <script>
-        // 1. MASTER ADMIN PASSWORD (UNLIMITED ACCESS)
         const ADMIN_PASS = "ARCHER2026"; 
-
-        // 2. PER-USER 30-DAY PASSKEY DATABASE
         const SUBSCRIBER_KEYS = {
-            "SMITH_PASSKEY_1": Date.now(),               // User 1 (Starts Today)
-            "JONES_PASSKEY_2": Date.parse("2026-08-01"), // User 2 (Started Aug 1)
-            "LEE_PASSKEY_3": Date.now()                  // User 3 (Starts Today)
+            "SMITH_PASSKEY_1": Date.now(),
+            "JONES_PASSKEY_2": Date.parse("2026-08-01"),
+            "LEE_PASSKEY_3": Date.now()
         };
 
         function verifyAccess() {
             const inputKey = document.getElementById('auth-passcode').value.trim();
             const errorEl = document.getElementById('auth-error');
 
-            // Check Master Admin Key
             if (inputKey === ADMIN_PASS) {
                 unlockStudio("Master Admin", "Unlimited Access");
                 return;
             }
 
-            // Check Individual User Passkey
             if (SUBSCRIBER_KEYS[inputKey]) {
                 const startDate = SUBSCRIBER_KEYS[inputKey];
                 const daysElapsed = (Date.now() - startDate) / (1000 * 60 * 60 * 24);
@@ -190,13 +188,13 @@
                     unlockStudio(inputKey, `${daysLeft} Days Left`);
                     return;
                 } else {
-                    errorEl.innerText = "Your 30-day access key has expired. Please contact Patrick to renew.";
+                    errorEl.innerText = "Your 30-day access key has expired.";
                     errorEl.classList.remove('hidden');
                     return;
                 }
             }
 
-            errorEl.innerText = "Invalid passkey. Please check your key or request access.";
+            errorEl.innerText = "Invalid passkey.";
             errorEl.classList.remove('hidden');
         }
 
@@ -211,7 +209,7 @@
             document.getElementById('studio-workspace').classList.add('hidden');
         }
 
-        // Studio Generator Logic
+        // Live Input Sync
         const sync = (inputId, displayId, prefix = '') => {
             const element = document.getElementById(inputId);
             if (element) {
@@ -249,54 +247,66 @@
             template.classList.add(`format-${format}`);
         }
 
-        // Property Photos Upload Handling
-        document.getElementById('image-upload').addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-            const container = document.getElementById('image-container');
-            const thumbContainer = document.getElementById('photo-thumbnails');
+        // DIRECT PHOTO DISPLAY CONTROLLER
+        function setMainImage(src) {
+            const mainImg = document.getElementById('main-ad-photo');
+            const placeholder = document.getElementById('photo-placeholder');
             
-            thumbContainer.innerHTML = ''; // Reset thumbnails
+            mainImg.src = src;
+            mainImg.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+        }
 
-            if (files.length === 0) return;
+        // PROPERTY PHOTO UPLOADER
+        document.getElementById('image-upload').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const thumbContainer = document.getElementById('photo-thumbnails');
+            thumbContainer.innerHTML = '';
 
-            files.forEach((file, index) => {
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach((file, index) => {
                 const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const src = ev.target.result;
-
-                    // Display the first image on the ad canvas immediately
+                reader.onload = function(event) {
+                    const imgUrl = event.target.result;
+                    
+                    // First image automatically loads as main ad display
                     if (index === 0) {
-                        setMainImage(src);
+                        setMainImage(imgUrl);
                     }
 
-                    // Create small selectable thumbnail for controls panel
+                    // Create selectable thumbnail box
                     const thumb = document.createElement('img');
-                    thumb.src = src;
-                    thumb.className = 'w-12 h-12 object-cover rounded border-2 cursor-pointer border-slate-700 hover:border-amber-400 transition';
-                    thumb.onclick = () => setMainImage(src);
+                    thumb.src = imgUrl;
+                    thumb.className = 'w-12 h-12 object-cover rounded border-2 border-slate-700 hover:border-amber-400 cursor-pointer transition flex-shrink-0';
+                    thumb.onclick = function() { setMainImage(imgUrl); };
                     thumbContainer.appendChild(thumb);
                 };
                 reader.readAsDataURL(file);
             });
         });
 
-        function setMainImage(src) {
-            const container = document.getElementById('image-container');
-            container.innerHTML = `<img src="${src}" class="w-full h-full object-cover">`;
-        }
-
-        // Agent Headshot Upload Handling
+        // HEADSHOT UPLOADER
         document.getElementById('headshot-upload').addEventListener('change', function(e) {
-            if (e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file) {
                 const reader = new FileReader();
-                reader.onload = (ev) => { document.getElementById('ad-headshot').src = ev.target.result; };
-                reader.readAsDataURL(e.target.files[0]);
+                reader.onload = function(event) {
+                    document.getElementById('ad-headshot').src = event.target.result;
+                };
+                reader.readAsDataURL(file);
             }
         });
 
+        // EXPORT FUNCTION WITH CORS & CANVAS FIXES
         function downloadAd() {
             const element = document.getElementById('ad-template');
-            html2canvas(element, { scale: 3 }).then(canvas => {
+            html2canvas(element, { 
+                scale: 3,
+                useCORS: true,
+                allowTaint: true,
+                logging: false
+            }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'cwhomesky-graphic.png';
                 link.href = canvas.toDataURL('image/png');
