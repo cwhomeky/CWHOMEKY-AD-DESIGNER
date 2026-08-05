@@ -20,6 +20,13 @@
         .format-feed { width: 420px; height: 420px; }
         .format-story { width: 340px; height: 600px; }
         .format-flyer { width: 420px; height: 540px; }
+
+        /* Drag-and-Drop Active Target Styling */
+        .drop-target-active {
+            outline: 3px dashed #f59e0b !important;
+            outline-offset: -4px;
+            background-color: rgba(245, 158, 11, 0.1) !important;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -90,12 +97,15 @@
                     <textarea id="input-description" rows="2" class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-white">Discover your opportunity to build the home of your dreams!</textarea>
                 </div>
 
-                <!-- Photo Upload & Dynamic Placement -->
-                <div class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-lg space-y-3">
-                    <label class="block font-bold text-amber-400">📷 Upload Listing Photos</label>
+                <!-- Photo Upload & Drop Zone Area -->
+                <div id="control-drop-zone" class="bg-amber-500/10 border border-amber-500/30 p-3 rounded-lg space-y-3 transition">
+                    <label class="block font-bold text-amber-400">📷 Drag & Drop Listing Photos Here</label>
+                    <div class="text-[11px] text-slate-400 border-2 border-dashed border-amber-500/40 p-3 rounded text-center">
+                        Drag photos anywhere on this box OR onto the canvas template on the right.
+                    </div>
                     <input type="file" id="image-upload" accept="image/*" multiple class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white cursor-pointer">
                     
-                    <!-- Selected Photo Manipulator Controls -->
+                    <!-- Selected Photo Controls -->
                     <div id="photo-controls" class="hidden space-y-2 pt-2 border-t border-slate-700">
                         <p class="font-bold text-slate-300 text-[11px]">Modify Selected Photo Layer:</p>
                         <div class="grid grid-cols-2 gap-2">
@@ -130,8 +140,8 @@
             <!-- RIGHT CANVAS PREVIEW -->
             <div class="lg:col-span-7 flex flex-col items-center justify-center glass-card p-6 rounded-xl min-h-[560px]">
                 
-                <!-- CANVAS TEMPLATE LAYER -->
-                <div id="ad-template" class="format-feed bg-slate-900 rounded-lg shadow-2xl relative overflow-hidden text-white border border-slate-700">
+                <!-- CANVAS TEMPLATE LAYER (ALSO DRAG AND DROP TARGET) -->
+                <div id="ad-template" class="format-feed bg-slate-900 rounded-lg shadow-2xl relative overflow-hidden text-white border border-slate-700 transition">
                     
                     <!-- DYNAMIC PHOTOS CONTAINER LAYER -->
                     <div id="photo-layers-wrapper" class="absolute inset-0 w-full h-full pointer-events-auto"></div>
@@ -175,7 +185,7 @@
                     </div>
                 </div>
 
-                <p class="text-[11px] text-slate-400 mt-3">💡 <strong>Tip:</strong> Click and drag <u>any</u> text box or photo to relocate it anywhere inside the graphic.</p>
+                <p class="text-[11px] text-slate-400 mt-3">💡 <strong>Tip:</strong> Drag and drop images directly onto the template. Click any element to drag, relocate, or resize.</p>
             </div>
 
         </div>
@@ -237,17 +247,51 @@
             template.classList.add(`format-${format}`);
         }
 
-        // PHOTO UPLOAD ENGINE
-        document.getElementById('image-upload').addEventListener('change', function(e) {
-            const files = e.target.files;
+        // HANDLE FILES PROCESSOR
+        function handleFiles(files) {
             if (!files || files.length === 0) return;
-
             Array.from(files).forEach((file) => {
-                const imgUrl = URL.createObjectURL(file);
-                createPhotoLayer(imgUrl);
+                if (file.type.startsWith('image/')) {
+                    const imgUrl = URL.createObjectURL(file);
+                    createPhotoLayer(imgUrl);
+                }
             });
+        }
+
+        // MANUAL FILE INPUT HANDLER
+        document.getElementById('image-upload').addEventListener('change', function(e) {
+            handleFiles(e.target.files);
         });
 
+        // DRAG AND DROP EVENT ENGINE FOR CANVAS AND CONTROL PANEL
+        const dropTargets = [document.getElementById('ad-template'), document.getElementById('control-drop-zone')];
+
+        dropTargets.forEach(target => {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                target.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                target.addEventListener(eventName, () => target.classList.add('drop-target-active'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                target.addEventListener(eventName, () => target.classList.remove('drop-target-active'), false);
+            });
+
+            target.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // CREATE MOVEABLE PHOTO LAYER
         function createPhotoLayer(src) {
             const wrapper = document.getElementById('photo-layers-wrapper');
             const imgContainer = document.createElement('div');
@@ -319,7 +363,7 @@
             }
         }
 
-        // DRAG & DROP ENGINE
+        // DRAG & DROP POSITIONING ENGINE FOR CANVAS LAYERS
         function makeElementDraggable(el) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             el.onmousedown = dragMouseDown;
