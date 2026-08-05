@@ -96,6 +96,7 @@
                 <div>
                     <label class="block font-bold text-slate-300 mb-1">Upload Main Property Photos</label>
                     <input type="file" id="image-upload" accept="image/*" multiple class="w-full text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-white">
+                    <div id="photo-thumbnails" class="flex gap-2 mt-2 overflow-x-auto pb-1"></div>
                 </div>
 
                 <!-- Headshot Upload -->
@@ -248,6 +249,43 @@
             template.classList.add(`format-${format}`);
         }
 
+        // Property Photos Upload Handling
+        document.getElementById('image-upload').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const container = document.getElementById('image-container');
+            const thumbContainer = document.getElementById('photo-thumbnails');
+            
+            thumbContainer.innerHTML = ''; // Reset thumbnails
+
+            if (files.length === 0) return;
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const src = ev.target.result;
+
+                    // Display the first image on the ad canvas immediately
+                    if (index === 0) {
+                        setMainImage(src);
+                    }
+
+                    // Create small selectable thumbnail for controls panel
+                    const thumb = document.createElement('img');
+                    thumb.src = src;
+                    thumb.className = 'w-12 h-12 object-cover rounded border-2 cursor-pointer border-slate-700 hover:border-amber-400 transition';
+                    thumb.onclick = () => setMainImage(src);
+                    thumbContainer.appendChild(thumb);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function setMainImage(src) {
+            const container = document.getElementById('image-container');
+            container.innerHTML = `<img src="${src}" class="w-full h-full object-cover">`;
+        }
+
+        // Agent Headshot Upload Handling
         document.getElementById('headshot-upload').addEventListener('change', function(e) {
             if (e.target.files[0]) {
                 const reader = new FileReader();
